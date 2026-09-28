@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Aino — example</title>
+<style>
+  :root { --ink: #15191a; --muted: rgba(21,25,26,.62); --line: rgba(21,25,26,.12); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #fbfaf6; color: var(--ink);
+    font: 17px/1.65 "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .nav {
+    display: flex; align-items: center; gap: 30px;
+    padding: 18px clamp(20px, 5vw, 56px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav strong { font-weight: 600; }
+  .nav nav { display: flex; gap: 24px; margin-left: auto; font-size: 14px; }
+  .nav nav a { color: var(--muted); text-decoration: none; }
+  .nav nav a:hover { color: var(--ink); }
+  main { max-width: 760px; padding: clamp(48px, 10vh, 110px) clamp(20px, 5vw, 56px); }
+  h1 { margin: 0; font-size: clamp(2rem, 5.5vw, 3.4rem); font-weight: 600; letter-spacing: -.04em; line-height: 1.04; }
+  p { color: var(--muted); max-width: 52ch; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .88em;
+         background: #f0f6e4; padding: 2px 6px; border-radius: 6px; }
+
+  /* a stand-in for whatever chat panel the host app already has */
+  .panel {
+    position: fixed; right: clamp(16px,3vw,28px); top: 76px; z-index: 50;
+    width: min(360px, calc(100vw - 32px)); height: min(460px, calc(100vh - 110px));
+    display: flex; flex-direction: column;
+    background: #fff; border: 1px solid var(--line); border-radius: 18px;
+    box-shadow: 0 24px 60px -20px rgba(21,25,26,.3);
+    opacity: 0; transform: translateY(-12px) scale(.96); transform-origin: 100% 0;
+    transition: opacity .24s ease, transform .28s cubic-bezier(.22,1,.36,1);
+  }
+  .panel[hidden] { display: none; }
+  .panel.is-open { opacity: 1; transform: none; }
+  .panel header { padding: 14px 18px; border-bottom: 1px solid var(--line); font-weight: 600; }
+  .panel div { padding: 18px; color: var(--muted); font-size: 14.5px; }
+
+  .log { margin-top: 28px; font-family: ui-monospace, Consolas, monospace; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <strong>Your app</strong>
+  <nav><a href="#">Home</a><a href="#">Docs</a></nav>
+
+  <!-- ── Aino ───────────────────────────────────────────── -->
+  <aino-button id="aino"></aino-button>
+</header>
+
+<main>
+  <h1>Aino drops into whatever you already have.</h1>
+  <p>
+    The button is the whole component. It emits <code>aino:toggle</code> and you
+    open your own chat panel — so it does not care whether you are running
+    React, Vue, Svelte or nothing at all.
+  </p>
+  <p>
+    The panel on the right is a stand-in for yours. Open it and the dinosaur
+    takes the full eight seconds to get up and roar; close it and the same eight
+    seconds runs backwards.
+  </p>
+  <p class="log" id="log">waiting…</p>
+</main>
+
+<section class="panel" id="panel" hidden>
+  <header>Your chat panel</header>
+  <div>Aino does not ship a panel. This is yours.</div>
+</section>
+
+<script type="module" src="../src/aino.js"></script>
+<script type="module">
+  const aino = document.getElementById('aino');
+  const panel = document.getElementById('panel');
+  const log = document.getElementById('log');
+
+  aino.addEventListener('aino:toggle', (e) => {
+    if (e.detail.open) {
+      panel.hidden = false;
+      requestAnimationFrame(() => panel.classList.add('is-open'));
+    } else {
+      panel.classList.remove('is-open');
+      setTimeout(() => { if (!aino.open) panel.hidden = true; }, 280);
+    }
+    log.textContent = `aino:toggle → open = ${e.detail.open}`;
+  });
+
+  // the sprite's state is readable, if you want to react to it
+  new MutationObserver(() => {
+    log.textContent = `open = ${aino.open}   ·   sprite = ${aino.state}`;
+  }).observe(aino, { attributes: true, attributeFilter: ['state'] });
+
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && aino.open) aino.hide(); });
+</script>
+</body>
+</html>

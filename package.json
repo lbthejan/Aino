@@ -1,0 +1,19 @@
+{
+  "name": "aino",
+  "version": "0.1.0",
+  "description": "A chat button with a dinosaur asleep inside it. Opens your chat, wakes up while it is open, goes back to sleep when you close it.",
+  "type": "module",
+  "main": "src/aino.js",
+  "module": "src/aino.js",
+  "exports": {
+    ".": "./src/aino.js",
+    "./assets/*": "./assets/*"
+  },
+  "files": ["src", "assets", "README.md", "LICENSE"],
+  "sideEffects": ["./src/aino.js"],
+  "keywords": ["web-component", "custom-element", "chat", "chat-button", "mascot", "animation", "webp"],
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/lbthejan/Aino.git" },
+  "bugs": { "url": "https://github.com/lbthejan/Aino/issues" },
+  "homepage": "https://github.com/lbthejan/Aino#readme"
+}
